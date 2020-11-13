@@ -4,7 +4,7 @@ This document helps you get started to use Alameda. If you do not have Alameda d
 
 ## Using Alameda
 
-To have Alameda makes resource usage recommendations for you, first thing is to tell Alameda what are the target containers by creating [_AlamedaScaler_](../design/crd_alamedascaler.md) CRs. Then you can see the recommendations by checking the [_alamedarecommendation_](../design/crd_alamedarecommendation.md) CRs or Grafana dashboards visualize them.
+To have Alameda makes resource usage recommendations for you, first thing is to tell Alameda what are the target containers by creating [_AlamedaScaler_](../design/crd_alamedascaler.md) CRs. Then you can see Grafana dashboards visualize them.
 
 ### Specify a target object
 
@@ -37,17 +37,6 @@ $ kubectl get alamedascalers -n <your namespace>
 and see the details by adding `-o yaml` flag.
 
 > **Note**: an *AlamedaScaler* CR only looks for _Deployment_/_DeploymentConfig_ objects in the same namespace.
-
-### Retrieve Alameda recommendations
-
-Alameda outputs recommendations and presents them as *alamedarecommendation* CRD.
-You can check Alameda recommendations by:
-```
-$ kubectl get alamedarecommendation -n <your namespace>
-```
-and see the details by adding `-o yaml` flag.
-
-This _AlamedaRecommendation_ CR serves as a good intermediate for programs (including Alameda itself) to reference the recommendations and react to them. For more details, please refer to the [*alamedarecommendation* CRD design](./design/crd_alamedarecommendation.md).
 
 ### Visualize Alameda recommendations
 
@@ -121,75 +110,6 @@ metadata:
   resourceVersion: ""
   selfLink: ""
 ```
-And the resource usage recommendations are:
-```
-$ kubectl get alamedarecommendation alameda -n webapp -o yaml
-apiVersion: v1
-items:
-- apiVersion: autoscaling.containers.ai/v1alpha1
-  kind: AlamedaRecommendation
-  metadata:
-    creationTimestamp: "2019-02-15T10:51:29Z"
-    generation: 13
-    labels:
-      alamedascaler: alameda.webapp
-    name: nginx-deployment-7bdddc58f9-6l677
-    namespace: webapp
-    ownerReferences:
-    - apiVersion: autoscaling.containers.ai/v1alpha1
-      blockOwnerDeletion: true
-      controller: true
-      kind: AlamedaScaler
-      name: alameda
-      uid: a60c4c47-310f-11e9-accd-000c29b48f2a
-    resourceVersion: "2482218"
-    selfLink: /apis/autoscaling.containers.ai/v1alpha1/namespaces/webapp/alamedarecommendations/nginx-deployment-7bdddc58f9-6l677
-    uid: a60f32f8-310f-11e9-accd-000c29b48f2a
-  spec:
-    containers:
-    - name: nginx
-      resources:
-        limits:
-          cpu: "0"
-          memory: 9636Ki
-        requests:
-          cpu: "0"
-          memory: 9636Ki
-  status: {}
-- apiVersion: autoscaling.containers.ai/v1alpha1
-  kind: AlamedaRecommendation
-  metadata:
-    creationTimestamp: "2019-02-15T10:51:29Z"
-    generation: 14
-    labels:
-      alamedascaler: alameda.webapp
-    name: nginx-deployment-7bdddc58f9-wfrbh
-    namespace: webapp
-    ownerReferences:
-    - apiVersion: autoscaling.containers.ai/v1alpha1
-      blockOwnerDeletion: true
-      controller: true
-      kind: AlamedaScaler
-      name: alameda
-      uid: a60c4c47-310f-11e9-accd-000c29b48f2a
-    resourceVersion: "2482651"
-    selfLink: /apis/autoscaling.containers.ai/v1alpha1/namespaces/webapp/alamedarecommendations/nginx-deployment-7bdddc58f9-wfrbh
-    uid: a61017e6-310f-11e9-accd-000c29b48f2a
-  spec:
-    containers:
-    - name: nginx
-      resources:
-        limits:
-          cpu: "0"
-          memory: 9384Ki
-        requests:
-          cpu: "0"
-          memory: 9384Ki
-  status: {}
-kind: List
-metadata:
-  resourceVersion: ""
-  selfLink: ""
-```
+
 By checking the Grafana dashboards, users can also visualize the resource prediction and recommendations.
 
