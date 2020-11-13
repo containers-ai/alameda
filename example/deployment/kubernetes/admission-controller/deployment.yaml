@@ -1,0 +1,79 @@
+---
+# Source: alameda/charts/admission-controller/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alameda-admission-controller
+  namespace: alameda
+  labels:
+    app: alameda
+    component: admission-controller
+spec:
+  replicas: 
+  selector:
+    matchLabels:
+      app: alameda
+      component: admission-controller
+  template:
+    metadata:
+      labels:
+        app: alameda
+        component: admission-controller
+    spec:
+      containers:
+        - name: admission-controller
+          image: "quay.io/prophetstor/alameda-admission-ubi:latest"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace   
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name 
+            - name: ALAMEDA_ADMCTL_CACERTFILE
+              value: "/etc/tls-certs/ca.crt"
+            - name: ALAMEDA_ADMCTL_TLSCERTFILE
+              value: "/etc/tls-certs/tls.crt"
+            - name: ALAMEDA_ADMCTL_TLSPRIVATEKEYFILE
+              value: "/etc/tls-certs/tls.key"
+            - name: ALAMEDA_ADMCTL_DEPLOYEDNAMESPACE
+              value: "alameda"
+            - name: ALAMEDA_ADMCTL_ENABLE
+              value: "true"
+            - name: ALAMEDA_ADMCTL_DATAHUB_ADDRESS
+              value: "alameda-datahub.alameda:50050"
+#            - name: ALAMEDA_ADMCTL_LOG_OUTPUT_LEVEL
+#              value: "debug"
+          resources:
+            {}
+            
+          readinessProbe:
+            exec:
+              command:
+              - /usr/local/bin/admission-controller
+              - probe
+              - --type=readiness
+            failureThreshold: 20
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - /usr/local/bin/admission-controller
+              - probe
+              - --type=liveness
+            failureThreshold: 20
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+          - mountPath: /etc/tls-certs
+            name: tls-certs
+            readOnly: true
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: alameda-admission-controller-tls
+      serviceAccountName: alameda-admission-controller

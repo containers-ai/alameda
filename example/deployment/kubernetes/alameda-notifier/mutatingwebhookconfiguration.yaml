@@ -1,0 +1,46 @@
+---
+# Source: alameda/charts/notifier/templates/mutatingwebhookconfiguration.yaml
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    certmanager.k8s.io/inject-ca-from: alameda/alameda-notifier-serving-cert
+  creationTimestamp: null
+  name: alameda-notifier-mutating-webhook-configuration
+webhooks:
+- clientConfig:
+    caBundle: Cg==
+    service:
+      name: alameda-notifier-webhook-service
+      namespace: alameda 
+      path: /mutate-notifying-containers-ai-v1alpha1-alamedanotificationchannel
+  failurePolicy: Fail
+  name: malamedanotificationchannel.containers.ai
+  rules:
+  - apiGroups:
+    - notifying.containers.ai
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - alamedanotificationchannels
+- clientConfig:
+    caBundle: Cg==
+    service:
+      name: alameda-notifier-webhook-service
+      namespace: alameda 
+      path: /mutate-notifying-containers-ai-v1alpha1-alamedanotificationtopic
+  failurePolicy: Fail
+  name: malamedanotificationtopic.containers.ai
+  rules:
+  - apiGroups:
+    - notifying.containers.ai
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - alamedanotificationtopics

@@ -1,0 +1,16 @@
+apiVersion: notifying.containers.ai/v1alpha1
+kind: AlamedaNotificationChannel
+metadata:
+  annotations:
+    notifying.containers.ai/test-channel: start
+    notifying.containers.ai/test-channel-to: to@example.com
+  name: alamedanotificationchannel-sample
+spec:
+  type: email
+  email:
+    server: mail.example.com
+    port: 465
+    from: from@example.com
+    username: username
+    password: password
+    encryption: tls

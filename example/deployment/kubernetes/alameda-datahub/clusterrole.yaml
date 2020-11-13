@@ -1,0 +1,24 @@
+---
+# Source: alameda/charts/datahub/templates/clusterrole.yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: alameda
+    component: alameda-datahub
+  name: alameda-datahub
+rules:
+- apiGroups: 
+  - ""
+  resources: 
+  - namespaces
+  verbs: 
+  - get
+- apiGroups:
+  - autoscaling.containers.ai
+  resources:
+  - alamedarecommendations
+  verbs:
+  - get
+  - update

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: alameda
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: operator
+  namespace: alameda
+  labels:
+    app: operator
+spec:
+  selector:
+    app: operator
+  ports:
+  - port: 50049
+    name: simplejson
+  - port: 50050
+    name: grpc
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: operator
+  namespace: alameda

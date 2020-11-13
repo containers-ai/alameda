@@ -1,0 +1,30 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    name: datahub-docker-build
+  name: datahub-docker-build
+  namespace: alameda
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: datahub:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    git:
+      uri: https://github.com/containers-ai/alameda.git
+    type: Git
+  strategy:
+    dockerStrategy: {
+      dockerfilePath: "./datahub/Dockerfile"
+    }
+    type: Docker
+  triggers:
+  - type: ConfigChange
+  - github:
+      secretReference:
+        name: secret101
+    type: GitHub

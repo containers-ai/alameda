@@ -1,0 +1,49 @@
+---
+# Source: alameda/charts/notifier/templates/clusterrole.yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: alameda-notifier-role
+rules:
+- apiGroups:
+  - notifying.containers.ai
+  resources:
+  - alamedanotificationchannels
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - notifying.containers.ai
+  resources:
+  - alamedanotificationchannels/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - notifying.containers.ai
+  resources:
+  - alamedanotificationtopics
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - notifying.containers.ai
+  resources:
+  - alamedanotificationtopics/status
+  verbs:
+  - get
+  - patch
+  - update

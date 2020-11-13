@@ -1,0 +1,172 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: kube-system
+---
+kind: SecurityContextConstraints
+apiVersion: v1
+metadata:
+  name: prometheus
+allowPrivilegedContainer: false
+runAsUser:
+  type: RunAsAny 
+seLinuxContext:
+  type: RunAsAny
+users:
+- system:serviceaccount:kube-system:prometheus
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: prometheus
+  labels:
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile 
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/metrics
+  - services
+  - endpoints
+  - nodes/proxy
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+- nonResourceURLs:
+  - "/metrics"
+  verbs:
+  - get
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: kube-system 
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus
+  namespace: kube-system
+data:
+  prometheus.yml: |
+  
+    global:
+      scrape_interval: 15s
+      scrape_timeout: 10s
+      evaluation_interval: 15s
+    alerting:
+      alertmanagers:
+      - static_configs:
+        - targets: []
+        scheme: http
+        timeout: 10s 
+
+    scrape_configs:
+
+      # This block configure prometheus to discover all pods and exposes their containers as targets.
+      # For each declared port of a container, a single target is generated.   
+    - job_name: exporter   
+      scrape_interval: 15s
+      scrape_timeout: 10s
+      metrics_path: /metrics
+      scheme: http
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:  # Dynamically skip target without alameda labels.
+      - source_labels: ["__meta_kubernetes_pod_annotation_alameda_scrape"]
+        regex: (true)
+        action: keep
+      - source_labels: ["__meta_kubernetes_pod_node_name"]
+        target_label: node_name
+
+      # This block configure prometheus to discover all nodes as targets.
+      # For each declared port of a container, a single target is generated.   
+    - job_name: kubernetes-cAdvisor
+      scheme: https
+      scrape_interval: 15s
+      scrape_timeout: 10s
+      metrics_path: /metrics
+      kubernetes_sd_configs:
+      - role: node
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token # for permission to query kubelet api
+      tls_config: # for validate certificate from kubelet 
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - target_label: __address__
+        replacement: kubernetes.default.svc:443
+      - source_labels: [__meta_kubernetes_node_name]
+        regex: (.+)
+        target_label: __metrics_path__
+        replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+
+    # In InfluxDB v1.5 and earlier, all Prometheus data goes into a single measurement named _,
+    # and the Prometheus measurement name is stored in the __name__ label.
+    # In InfluxDB v1.6+, every Prometheus measurement gets its own InfluxDB measurement.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus2.4
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      apps: prometheus2.4
+  template:
+    metadata:
+      labels:
+        apps: prometheus2.4
+    spec:
+      containers:
+      - image: prom/prometheus:v2.4.3
+        name: prometheus
+        volumeMounts:
+        - name: prometheus-conf
+          subPath: prometheus.yml
+          mountPath: /etc/prometheus/prometheus.yml
+      serviceAccountName: prometheus
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: prometheus-conf
+        configMap:
+          name: prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    apps: prometheus2.4
+  name: prometheus24
+  namespace: kube-system
+spec:
+  ports:
+    - name: prometheus
+      port: 80
+      protocol: TCP
+      targetPort: 9090
+  selector:
+    apps: prometheus2.4
+  type: ClusterIP

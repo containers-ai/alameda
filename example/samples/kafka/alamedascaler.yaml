@@ -1,0 +1,34 @@
+apiVersion: autoscaling.containers.ai/v1alpha1
+kind: AlamedaScaler
+metadata:
+  name: consumer
+  namespace: federatorai
+spec:
+  enableExecution: true
+  policy: stable
+  type: kafka
+  scalingTool:
+    type: hpa
+  kafka:
+    exporterNamespace: kafka
+    topics:
+    - topic2020
+    - topic2021
+    - topic2022
+    consumerGroups:
+    - name: consumergroup-1
+      majorTopic: topic2022
+      resource:
+        kubernetes:
+          selector:
+            matchLabels:
+              component: alameda-datahub
+    - name: consumergroup-2
+      resource:
+        kubernetes:
+          selector:
+            matchLabels:
+              component: fedemeter-api
+    - name: consumergroup-3
+      resource:
+        custom: "test-custom-name" 

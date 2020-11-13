@@ -1,0 +1,52 @@
+---
+# Source: influxdb/templates/deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: alameda-influxdb
+  labels:
+    app: alameda-influxdb
+    chart: "influxdb-1.3.3"
+    release: "alameda-influxdb"
+    heritage: "Tiller"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: alameda-influxdb
+        release: "alameda-influxdb"
+    spec:
+      containers:
+      - name: alameda-influxdb
+        image: "influxdb:1.7.6-alpine"
+        imagePullPolicy: "IfNotPresent"
+        resources:
+          {}
+          
+        ports:
+        - name: api
+          containerPort: 8086
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: api
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: api
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/influxdb
+        - name: config
+          mountPath: /etc/influxdb
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: alameda-influxdb

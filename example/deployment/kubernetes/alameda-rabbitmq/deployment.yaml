@@ -1,0 +1,56 @@
+---
+# Source: alameda/charts/rabbitmq/templates/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment 
+metadata:  
+  namespace: alameda  
+  name: alameda-rabbitmq
+  labels:
+    app: rabbitmq
+    chart: rabbitmq-0.3.0
+    release: "alameda"
+    heritage: "Tiller"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+      release: "alameda"  
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+        release: "alameda"
+        chart: rabbitmq-0.3.0
+    spec:
+      serviceAccountName: alameda-rabbitmq      
+      terminationGracePeriodSeconds: 10
+      containers:        
+      - name: rabbitmq
+        image: quay.io/prophetstor/alameda-rabbitmq:latest
+        ports:
+          - name: http
+            protocol: TCP
+            containerPort: 15672
+          - name: amqp
+            protocol: TCP
+            containerPort: 5672
+        livenessProbe:
+          exec:
+            command: ["rabbitmqctl", "status"]           
+          initialDelaySeconds: 60
+          timeoutSeconds: 15
+          periodSeconds: 60                  
+        readinessProbe:
+          exec:
+            command: ["rabbitmqctl", "status"]              
+          initialDelaySeconds: 20
+          timeoutSeconds: 10
+          periodSeconds: 60
+        imagePullPolicy: "IfNotPresent" 
+        env:
+          - name: RABBITMQ_DEFAULT_USER
+            value: "admin"            
+          - name: RABBITMQ_DEFAULT_PASS
+            value: "adminpass"

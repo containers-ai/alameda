@@ -1,0 +1,15 @@
+---
+# Source: alameda/charts/notifier/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: alameda-notifier-webhook-service
+  namespace: alameda 
+spec:
+  ports:
+  - port: 443
+    targetPort: 50443    
+  selector:
+    app: alameda
+    component: alameda-notifier
+

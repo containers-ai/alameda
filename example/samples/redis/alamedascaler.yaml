@@ -1,0 +1,14 @@
+apiVersion: autoscaling.containers.ai/v1alpha1
+kind: AlamedaScaler
+metadata:
+  name: alameda
+  namespace: webapp
+spec:
+  policy: stable
+  enableExecution: true
+  scalingTool:
+    type: vpa
+  selector:
+    matchLabels:
+      app: redis
+      

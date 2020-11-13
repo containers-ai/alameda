@@ -1,0 +1,52 @@
+---
+# Source: alameda/charts/executor/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alameda-executor
+  namespace: alameda
+  labels:
+    app: alameda
+    component: alameda-executor
+spec:
+  selector:
+    matchLabels:
+      component: alameda-executor
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: alameda
+        component: alameda-executor
+    spec:
+      serviceAccountName: alameda-executor
+      containers:
+      - name: executor
+        image: "quay.io/prophetstor/alameda-executor-ubi:latest"
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: alameda-executor
+            mountPath: /etc/alameda/federatorai-execution/config.yml
+            subPath: config.yml
+        readinessProbe:
+          exec:
+            command:
+            - /usr/local/bin/federatorai-executor
+            - probe
+            - --type=readiness
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - /usr/local/bin/federatorai-executor
+            - probe
+            - --type=liveness
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:        
+        - name: alameda-executor
+          configMap:
+            name: alameda-executor

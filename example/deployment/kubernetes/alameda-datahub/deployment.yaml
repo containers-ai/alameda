@@ -1,0 +1,63 @@
+---
+# Source: alameda/charts/datahub/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alameda-datahub
+  namespace: alameda
+  labels:
+    app: alameda
+    component: alameda-datahub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alameda
+      component: alameda-datahub
+  template:
+    metadata:
+      labels:
+        app: alameda
+        component: alameda-datahub
+    spec:
+      containers:
+        - name: datahub
+          image: "quay.io/prophetstor/alameda-datahub-ubi:latest"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ALAMEDA_DATAHUB_INFLUXDB_ADDRESS
+              value: "http://alameda-influxdb.default.svc:8086"
+            - name: ALAMEDA_DATAHUB_INFLUXDB_USERNAME
+              value: "alameda"
+            - name: ALAMEDA_DATAHUB_INFLUXDB_PASSWORD
+              value: "alameda"
+            - name: ALAMEDA_DATAHUB_INFLUXDB_INSECURESKIPVERIFY
+              value: "true"
+            - name: ALAMEDA_DATAHUB_PROMETHEUS_TLSCONFIG_INSECURESKIPVERIFY
+              value: "true"
+            - name: ALAMEDA_DATAHUB_PROMETHEUS_BEARERTOKENFILE
+              value: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+            - name: ALAMEDA_DATAHUB_PROMETHEUS_URL
+              value: "http://prometheus-prometheus-oper-prometheus.monitoring:9090"
+            - name: ALAMEDA_DATAHUB_RABBITMQ_URL
+              value: "amqp://admin:adminpass@alameda-rabbitmq.alameda:5672"
+          resources:
+            {}
+
+          readinessProbe:
+            exec:
+              command:
+              - /usr/local/bin/datahub
+              - probe
+              - --type=readiness
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - /usr/local/bin/datahub
+              - probe
+              - --type=liveness
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      serviceAccountName: alameda-datahub
