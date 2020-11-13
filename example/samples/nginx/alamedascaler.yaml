@@ -7,7 +7,7 @@ spec:
   policy: stable
   enableExecution: true
   scalingTool:
-    type: vpa
+    type: hpa
   selector:
     matchLabels:
       app: nginx
