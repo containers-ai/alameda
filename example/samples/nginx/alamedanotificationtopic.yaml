@@ -1,0 +1,23 @@
+apiVersion: notifying.containers.ai/v1alpha1
+kind: AlamedaNotificationTopic
+metadata:
+  name: alamedanotificationtopic-sample
+spec:
+  channel:
+    emails:
+      - name: alamedanotificationchannel-sample
+        to:
+          - to@example.com
+        cc:
+          - cc@example.com
+  topics:
+    - type:
+        - PodRegister
+      subject:
+        - namespace: default
+          name: example
+          kind: Pod
+      level:
+        - info
+      source:
+        - component: alameda-operator

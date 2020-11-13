@@ -1,0 +1,30 @@
+apiVersion: autoscaling.containers.ai/v1alpha2
+kind: AlamedaScaler
+metadata:
+  name: redis-scaler
+  namespace: redis1
+spec:
+  clusterName: 2876c4e4-2886-483b-8059-a5be9b13cdxx
+  controllers:
+    - type: generic
+      enableExecution: true
+      scaling: hpa
+      generic:
+        target:
+          namespace: redis1
+          name: redis1
+          kind: Deployment
+        hpaParameters:
+          maxReplicas: 40
+          minReplicas: 1
+    - type: generic
+      enableExecution: true
+      scaling: hpa
+      generic:
+        target:
+          namespace: redis2
+          name: redis2
+          kind: StatefulSet
+        hpaParameters:
+          maxReplicas: 20
+          minReplicas: 2

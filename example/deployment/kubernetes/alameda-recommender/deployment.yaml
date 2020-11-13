@@ -1,0 +1,56 @@
+---
+# Source: alameda/charts/recommender/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alameda-recommender
+  namespace: alameda
+  labels:
+    app: alameda
+    component: alameda-recommender
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alameda
+      component: alameda-recommender
+  template:
+    metadata:
+      labels:
+        app: alameda
+        component: alameda-recommender
+    spec:
+      containers:
+        - name: recommender
+          image: "quay.io/prophetstor/alameda-recommender-ubi:latest"
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: FEDERATOR_AI_SETUP_TYPE
+            value: "on-premise"
+          volumeMounts:
+          - name: alameda-recommender
+            mountPath: /etc/alameda/federatorai-recommendation/config.toml
+            subPath: config.toml            
+          resources:
+            {}
+            
+          readinessProbe:
+            exec:
+              command:
+              - /usr/local/bin/federatorai-recommender
+              - probe
+              - --type=readiness
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - /usr/local/bin/federatorai-recommender
+              - probe
+              - --type=liveness
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+      - name: alameda-recommender
+        configMap:
+          name: alameda-recommender

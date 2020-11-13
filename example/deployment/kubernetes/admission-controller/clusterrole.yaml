@@ -1,0 +1,67 @@
+---
+# Source: alameda/charts/admission-controller/templates/clusterrole.yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: alameda
+    component: admission-controller
+  name: alameda-admission-controller
+rules:
+- apiGroups:
+    - "admissionregistration.k8s.io"
+  resources:
+    - mutatingwebhookconfigurations
+  verbs:
+    - get
+    - create
+    - update
+    - delete
+- apiGroups:
+    - ""
+  resources:
+    - pods
+  verbs:
+    - get
+    - list
+    - patch
+- apiGroups:
+    - extensions
+    - apps
+  resources:
+    - replicasets
+    - deployments
+  verbs:
+    - get
+    - list
+- apiGroups:
+    - extensions
+    - ""
+  resources:
+    - replicationcontrollers
+  verbs:
+    - get
+    - list
+- apiGroups:
+    - apps.openshift.io
+  resources:
+    - deploymentconfigs
+  verbs:
+    - get
+    - list
+- apiGroups:
+    - autoscaling.containers.ai
+  resources:
+    - alamedascalers
+  verbs:
+    - get
+- apiGroups:
+    - federatorai.containers.ai
+  resources:
+    - alamedaservices
+  verbs:
+    - get
+    - list
+    - watch
+

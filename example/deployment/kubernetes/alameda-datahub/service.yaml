@@ -1,0 +1,19 @@
+---
+# Source: alameda/charts/datahub/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: alameda-datahub
+  namespace: alameda
+  labels:
+    app: alameda
+    component: alameda-datahub
+spec:
+  type: ClusterIP
+  ports:
+    - port: 50050
+      protocol: TCP
+      name: grpc
+  selector:
+    app: alameda
+    component: alameda-datahub

@@ -1,0 +1,9 @@
+---
+# Source: alameda/charts/notifier/templates/issuer.yaml
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: alameda-notifier-selfsigned-issuer
+  namespace: alameda
+spec:
+  selfSigned: {}

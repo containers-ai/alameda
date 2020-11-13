@@ -1,0 +1,38 @@
+apiVersion: autoscaling.containers.ai/v1alpha2
+kind: AlamedaScaler
+metadata:
+  name: nginx-hpa
+  namespace: federatorai
+spec:
+  clusterName: 2876c4e4-2886-483b-8059-a5be9b13cdxx
+  controllers:
+    - type: nginx
+      enableExecution: true
+      scaling: hpa
+      nginx:
+        target:
+          namespace: nginx1
+          name: nginx1
+          kind: Deployment
+        serviceName: nginx-service
+        exporterNamespace: openshift-ingress
+        hpaParameters:
+          targetResponseTime: 200
+          maxReplicas: 40
+          minReplicas: 1
+          replicaMarginPercentage: 0
+    - type: nginx
+      enableExecution: true
+      scaling: hpa
+      nginx:
+        target:
+          namespace: nginx2
+          name: nginx2
+          kind: StatefulSet
+        serviceName: nginx-service
+        exporterNamespace: openshift-ingress
+        hpaParameters:
+          targetResponseTime: 100
+          maxReplicas: 20
+          minReplicas: 2
+          replicaMarginPercentage: 0

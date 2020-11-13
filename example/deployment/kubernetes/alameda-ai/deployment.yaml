@@ -1,0 +1,39 @@
+---
+# Source: alameda/charts/ai/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alameda-ai
+  namespace: alameda
+  labels:
+    app: alameda
+    component: alameda-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alameda
+      component: alameda-ai
+  template:
+    metadata:
+      labels:
+        app: alameda
+        component: alameda-ai
+    spec:
+      containers:
+        - name: ai
+          image: "quay.io/prophetstor/alameda-ai:latest"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATAHUB_ADDRESS
+              value: "alameda-datahub.alameda:50050"
+            - name: PREDICT_QUEUE_ENABLED
+              value: "true"
+            - name: MAXIMUM_PREDICT_PROCESSES
+              value: "8"
+            - name: PREDICT_QUEUE_URL
+              value: "amqp://admin:adminpass@alameda-rabbitmq.alameda:5672"
+          resources:
+            {}
+            
+      serviceAccountName: alameda-ai

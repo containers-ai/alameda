@@ -1,0 +1,36 @@
+apiVersion: autoscaling.containers.ai/v1alpha2
+kind: AlamedaScaler
+metadata:
+  name: kafka-hpa
+  namespace: federatorai
+spec:
+  clusterName: 2876c4e4-2886-483b-8059-a5be9b13cdxx
+  controllers:
+    - type: kafka
+      enableExecution: true
+      scaling: hpa
+      kafka:
+        exporterNamespace: myproject
+        consumerGroup:
+          namespace: kafka1
+          name: kafka1
+          kind: Deployment
+          topic: topic0001
+          groupId: group0001
+        hpaParameters:
+          maxReplicas: 40
+          minReplicas: 1
+    - type: kafka
+      enableExecution: true
+      scaling: hpa
+      kafka:
+        exporterNamespace: myproject
+        consumerGroup:
+          namespace: kafka2
+          name: kafka2
+          kind: StatefulSet
+          topic: topic0003
+          groupId: group0002
+        hpaParameters:
+          maxReplicas: 20
+          minReplicas: 2

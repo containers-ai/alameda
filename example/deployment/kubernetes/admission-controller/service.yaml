@@ -1,0 +1,19 @@
+---
+# Source: alameda/charts/admission-controller/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+#  name: alameda-admission-controller
+# webhook name is hardcoded to admission-controller
+  name: admission-controller
+  namespace: alameda
+  labels:
+    app: alameda
+    component: admission-controller
+spec:
+  ports:
+    - port: 443
+      targetPort: 8000
+  selector:
+    app: alameda
+    component: admission-controller

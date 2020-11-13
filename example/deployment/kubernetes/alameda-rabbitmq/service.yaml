@@ -1,0 +1,25 @@
+---
+# Source: alameda/charts/rabbitmq/templates/service.yaml
+
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: alameda
+  name: alameda-rabbitmq
+  labels:
+    app: rabbitmq
+    chart: rabbitmq-0.3.0
+    release: "alameda"
+    heritage: "Tiller"
+    type: ClusterIP 
+spec:   
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+    - name: http
+      port: 15672
+      targetPort: http
+  selector:
+    app: rabbitmq
+    release: "alameda"

@@ -1,0 +1,28 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    name: alameda-ai-docker-build
+  name: alameda-ai-docker-build
+  namespace: alameda
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: alameda-ai:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    git:
+      uri: https://github.com/containers-ai/alameda-ai.git
+    type: Git
+  strategy:
+    dockerStrategy: {}
+    type: Docker
+  triggers:
+  - type: ConfigChange
+  - github:
+      secretReference:
+        name: secret101
+    type: GitHub

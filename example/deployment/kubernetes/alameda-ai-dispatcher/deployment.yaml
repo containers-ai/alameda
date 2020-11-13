@@ -1,0 +1,51 @@
+---
+# Source: alameda/charts/ai-dispatcher/templates/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alameda-ai-dispatcher
+  namespace: alameda
+  labels:
+    app: alameda
+    component: alameda-ai-dispatcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alameda
+      component: alameda-ai-dispatcher
+  template:
+    metadata:
+      labels:
+        app: alameda
+        component: alameda-ai-dispatcher
+    spec:
+      containers:
+        - name: ai-dispatcher
+          image: "quay.io/prophetstor/alameda-ai-dispatcher:latest"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ALAMEDA_AI_DISPATCHER_DATAHUBADDRESS
+              value: "alameda-datahub.alameda:50050"
+            - name: ALAMEDA_AI_DISPATCHER_QUEUE_URL
+              value: "amqp://admin:adminpass@alameda-rabbitmq.alameda:5672"
+          resources:
+            {}
+            
+          readinessProbe:
+            exec:
+              command:
+              - /usr/local/bin/ai-dispatcher                
+              - probe
+              - --type=readiness
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - /usr/local/bin/ai-dispatcher                
+              - probe
+              - --type=liveness
+            initialDelaySeconds: 5
+            periodSeconds: 5
