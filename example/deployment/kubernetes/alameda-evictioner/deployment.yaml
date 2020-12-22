@@ -1,0 +1,53 @@
+---
+# Source: alameda/charts/evictioner/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alameda-evictioner
+  namespace: alameda
+  labels:
+    app: alameda
+    component: alameda-evictioner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alameda
+      component: alameda-evictioner
+  template:
+    metadata:
+      labels:
+        app: alameda
+        component: alameda-evictioner
+    spec:
+      containers:
+        - name: evictioner
+          image: "quay.io/prophetstor/alameda-evictioner-ubi:latest"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ALAMEDA_EVICTIONER_DATAHUB_ADDRESS
+              value: "alameda-datahub.alameda:50050"
+            - name: ALAMEDA_EVICTIONER_EVICTION_ENABLE
+              value: "true"
+#            - name: ALAMEDA_EVICTIONER_LOG_OUTPUT_LEVEL
+#              value: "debug"
+          resources:
+            {}
+            
+          readinessProbe:
+            exec:
+              command:
+              - /usr/local/bin/evictioner
+              - probe
+              - --type=readiness
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - /usr/local/bin/evictioner
+              - probe
+              - --type=liveness
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      serviceAccountName: alameda-evictioner

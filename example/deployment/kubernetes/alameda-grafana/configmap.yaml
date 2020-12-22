@@ -1,0 +1,57 @@
+---
+# Source: grafana/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alameda-grafana
+  namespace: alameda
+  labels:
+    app: grafana
+    chart: grafana-3.8.4
+    release: alameda-grafana
+    heritage: Tiller
+data:
+  grafana.ini: |
+    [analytics]
+    check_for_updates = true
+    [grafana_net]
+    url = https://grafana.net
+    [log]
+    mode = console
+    [paths]
+    data = /var/lib/grafana/data
+    logs = /var/log/grafana
+    plugins = /var/lib/grafana/plugins
+    provisioning = /etc/grafana/provisioning
+
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - access: proxy
+      isDefault: true
+      name: Prometheus
+      type: prometheus
+      url: http://prometheus-prometheus-oper-prometheus.monitoring:9090
+    - access: proxy
+      database: _internal
+      isDefault: false
+      name: InfluxDB
+      type: influxdb
+      url: http://alameda-influxdb.default.svc:8086
+    
+  dashboardproviders.yaml: |
+    apiVersion: 1
+    providers:
+    - disableDeletion: false
+      editable: true
+      folder: alameda
+      name: alameda
+      options:
+        path: /var/lib/grafana/dashboards/alameda
+      orgId: 1
+      type: file
+    
+  download_dashboards.sh: |
+    #!/usr/bin/env sh
+    set -euf
+    mkdir -p /var/lib/grafana/dashboards/alameda

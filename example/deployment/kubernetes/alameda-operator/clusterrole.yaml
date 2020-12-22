@@ -1,0 +1,135 @@
+---
+# Source: alameda/templates/clusterrole.yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: alameda
+    component: alameda-operator
+  name: alameda-operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - pods
+  - replicationcontrollers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  - deployments
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apps.openshift.io
+  resources:
+  - deploymentconfigs
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - autoscaling.containers.ai
+  resources:
+  - alamedascalers
+  - alamedarecommendations
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - autoscaling.containers.ai
+  resources:
+  - alamedascalers/finalizers
+  verbs:
+  - update
+# Permission for query prometheus under namespace openshift-monitoring
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - create
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - watch
+  - list
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - watch
+  - create
+  - update
+  - list
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - watch
+  - create
+  - update
+  - list
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: alameda-operator-aggregate-alameda-admin-edit
+  labels:
+    app: alameda
+    component: alameda-operator
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+rules:
+- apiGroups:
+  - autoscaling.containers.ai
+  resources:
+  - alamedascalers
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+- apiGroups:
+  - autoscaling.containers.ai
+  resources:
+  - alamedarecommendations
+  verbs:
+  - get
+  - list
+  - watch

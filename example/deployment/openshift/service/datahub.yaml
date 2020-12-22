@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: datahub
+  namespace: alameda
+  labels:
+    app: datahub
+spec:
+  selector:
+    app: datahub
+  ports:
+  - port: 50050
+    name: grpc
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datahub
+  namespace: alameda

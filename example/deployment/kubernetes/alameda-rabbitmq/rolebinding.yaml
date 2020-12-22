@@ -1,0 +1,15 @@
+---
+# Source: alameda/charts/rabbitmq/templates/rolebinding.yaml
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: alameda-rabbitmq
+  namespace: alameda
+subjects:
+- kind: ServiceAccount
+  name: alameda-rabbitmq
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: alameda-rabbitmq

@@ -1,0 +1,54 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: dashboard
+  name: dashboard
+  namespace: alameda
+spec:
+  replicas: 1
+  selector:
+    app: dashboard
+    deploymentconfig: dashboard
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: dashboard
+        deploymentconfig: dashboard
+    spec:
+      containers:
+      - env:
+        imagePullPolicy: Always
+        name: dashboard
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: dashboard
+      serviceAccountName: dashboard
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - dashboard
+      from:
+        kind: ImageStreamTag
+        name: dashboard:latest
+        namespace: alameda
+    type: ImageChange

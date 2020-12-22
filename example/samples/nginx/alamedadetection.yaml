@@ -1,0 +1,40 @@
+apiVersion: analysis.containers.ai/v1alpha1
+kind: AlamedaDetection
+metadata:
+  name: example-alamedadetection
+spec:
+  workloadThreshold:
+    resources:
+    - name: app1
+      resourceType: application
+      selector:
+        name: nginx*
+        namespace: nginx
+        match: prefix
+      inheritedRule: highly-utilized
+      detectionMode: ""
+    - name: app2
+      resourceType: application
+      selector:
+        name: tomcatScaler
+        namespace: tomcat
+        match: exact
+      inheritedRule: highly-utilized
+      detectionMode: ""
+    - name: ns1
+      resourceType: namespace
+      selector:
+        name: federatorai
+        namespace: ""
+        match: exact
+      inheritedRule: highly-utilized
+      detectionMode: ""
+    rules:
+    - name: highly-utilized
+      thresholds:
+      - metric: cpu
+        overrun: 1000m
+        underrun: 100m
+      - metric: mem
+        overrun: 1Gi
+        underrun: 100Mi

@@ -1,0 +1,58 @@
+---
+# Source: alameda/charts/notifier/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alameda
+    component: alameda-notifier
+  name: alameda-notifier  
+  namespace: alameda  
+spec:
+  serviceAccountName: alameda-notifier
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alameda
+      component: alameda-notifier
+  template:
+    metadata:
+      labels:
+        app: alameda
+        component: alameda-notifier
+    spec:
+      containers:
+      - name: notifier
+        image: quay.io/prophetstor/alameda-notifier-ubi:latest        
+        env:
+          - name: ALAMEDA_NOTIFIER_DATAHUB_ADDRESS
+            value: "alameda-datahub.alameda:50050"
+          - name: ALAMEDA_NOTIFIER_RABBITMQ_URL 
+            value: "amqp://admin:adminpass@alameda-rabbitmq.alameda:5672"
+        resources:
+            {}
+            
+        readinessProbe:
+          exec:
+            command:
+            - /usr/local/bin/notifier              
+            - --readiness-probe              
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - /usr/local/bin/notifier              
+            - --liveness-probe              
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: alameda-notifier-webhook-server-cert

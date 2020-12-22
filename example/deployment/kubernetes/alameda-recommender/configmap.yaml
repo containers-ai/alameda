@@ -1,0 +1,27 @@
+---
+# Source: alameda/charts/recommender/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alameda-recommender
+  namespace: alameda
+data:
+  config.toml: |-
+    [global]
+    hpa_interval = 180
+    vpa_short_interval = 300
+    vpa_long_interval = 3600
+    debug = false
+
+    [datahub]
+    address = "alameda-datahub.alameda.svc"
+    port = 50050
+
+    [hpa_scaling]
+    alpha = 0.25
+    k8s_threshold = 0.8
+    limits_threshold = 0.9
+    sample_rate = 15
+    period_rate = 60
+    period_count = 5
+    data_source = "workload"

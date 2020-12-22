@@ -1,0 +1,17 @@
+---
+# Source: grafana/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: alameda-grafana
+  namespace: alameda
+  labels:
+    app: grafana
+    chart: grafana-3.8.4
+    heritage: Tiller
+    release: alameda-grafana
+rules:
+- apiGroups:      ['extensions']
+  resources:      ['podsecuritypolicies']
+  verbs:          ['use']
+  resourceNames:  [alameda-grafana]

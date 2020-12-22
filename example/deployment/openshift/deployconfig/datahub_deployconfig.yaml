@@ -1,0 +1,56 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: datahub
+  name: datahub
+  namespace: alameda
+spec:
+  replicas: 1
+  selector:
+    app: datahub
+    deploymentconfig: datahub
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: datahub
+        deploymentconfig: datahub
+    spec:
+      containers:
+      - env:
+        - name: ALAMEDA_DATAHUB_PROMETHEUS_URL
+          value: http://prometheus24.kube-system.svc.cluster.local:80
+        imagePullPolicy: Always
+        name: datahub
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: datahub
+      serviceAccountName: datahub
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - datahub
+      from:
+        kind: ImageStreamTag
+        name: datahub:latest
+        namespace: alameda
+    type: ImageChange
