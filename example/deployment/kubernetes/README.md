@@ -75,11 +75,3 @@ This component leverages the open source [InfluxDB](https://github.com/influxdat
 ```
 $ kubectl apply -f example/deployment/kubernetes/alameda-influxdb/
 ```
-
-### alameda-grafana
-This component leverages the open source [Grafana](https://github.com/grafana/grafana). To install it, please execute:
-```
-$ kubectl apply -f example/deployment/kubernetes/alameda-grafana/
-```
-This will install Grafana with default datasources and customized dashboards. Please also note that the Prometheus URL is set to _http://prometheus-prometheus-oper-prometheus.monitoring:9090_. Please change that according to your environment before applying the configmap manifest.
-

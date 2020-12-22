@@ -40,7 +40,6 @@ spec:
             scalingTools:
               items:
                 enum:
-                - vpa
                 - hpa
                 type: string
               type: array

@@ -124,8 +124,6 @@ Clone code and build docker image for operator and dashboard
 git clone https://github.com/containers-ai/alameda.git
 cd alameda/operator
 docker build -t operator .
-cd ../grafana
-docker build -t dashboard .
 ```
 Clone code and build docker image for alameda-ai
 ```
